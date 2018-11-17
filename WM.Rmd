@@ -1,39 +1,86 @@
 ---
-title: "WM"
+title: "Initial Web Mining"
 author: "Jinfei Xue"
-date: "2018Äê11ÔÂ12ÈÕ"
-output: word_document
+date: "Nov 16, 2018"
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
+```{r, warning=FALSE, message=FALSE}
+#install.packages("rvest")
+#install.packages("dplyr")
+#install.packages("knitr")
 library(rvest)
 library(dplyr)
+library(knitr)
+```
+
+## War Timeline
+
+```{r, warning=FALSE, message=FALSE}
+
 url <- "https://www.iwm.org.uk/history/timeline-of-20th-and-21st-century-wars"
 timeline <- url %>%
     read_html() %>%
     html_nodes(css = 'strong')%>%
   html_text() 
-#timeline <- filter(timeline !="-" & "-19")
 
+timeline <- timeline[!timeline %in% c("â€“", "â€“19", "â€“199")]
+
+war <- rep(NA, length(timeline))
+time <- rep(NA, length(timeline))
+for (i in 1:length(timeline)) {
+  war[i] <- unlist(strsplit(timeline[i], ", "))[1]
+  time[i] <- unlist(strsplit(timeline[i], ", "))[2]
+}
+war_tl <- data.frame(war, time)
+kable(war_tl)
 
 ```
 
-## Including Plots
+## Common Factors Research
 
-You can also embed plots, for example:
+We first search for some researches about common factors of wars.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+### The 8 Main Reasons for War
+```{r}
+url <- "https://owlcation.com/social-sciences/The-Main-Reasons-For-War"
+# 8 Main Reasons
+MRW <- url %>%
+    read_html() %>%
+    html_nodes(xpath = '//*[@id="txtd_45775170"]')%>%
+  html_text() 
+MRW <- unlist(strsplit(MRW, "\n"))
+MRW <- MRW[-9]
+# War examples for each main reason
+war_ex <- url %>%
+    read_html() %>%
+    html_nodes(css = 'li strong')%>%
+  html_text() 
+war_ex <- war_ex[1:23]
+# Combine
+reasons <- rep(MRW, c(2,3,5,2,2,4,4,1))
+mrw <- data.frame(reasons, war_ex)
+kable(mrw)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We can see the eight main reasons for wars are "Economic Gain", "Territorial Gain", "Religion", "Nationalism", "Revenge", "Civil War", "Revolutionary War" and "Defensive War".
+
+### The Causes of War and Those of Peace
+```{r}
+url <- "https://www.theobjectivestandard.com/2014/10/causes-war-peace/"
+# Wikipedia: Causes of Wars
+causes <- url %>%
+    read_html() %>%
+    html_nodes(css = 'td:nth-child(1) strong')%>%
+  html_text() 
+causes
+
+```
+
