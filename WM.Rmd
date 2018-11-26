@@ -3,9 +3,9 @@ title: "Initial Web Mining"
 author: "Jinfei Xue"
 date: "Nov 16, 2018"
 output:
-  word_document: default
   html_document:
     df_print: paged
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -31,7 +31,7 @@ timeline <- url %>%
     html_nodes(css = 'strong')%>%
   html_text() 
 
-timeline <- timeline[!timeline %in% c("–", "–19", "–199")]
+timeline <- timeline[!timeline %in% c("?C", "?C19", "?C199")]
 
 war <- rep(NA, length(timeline))
 time <- rep(NA, length(timeline))
@@ -39,7 +39,8 @@ for (i in 1:length(timeline)) {
   war[i] <- unlist(strsplit(timeline[i], ", "))[1]
   time[i] <- unlist(strsplit(timeline[i], ", "))[2]
 }
-war_tl <- data.frame(war, time)
+war_tl <- unique(data.frame(war, time))
+rownames(war_tl) <- 1:19
 kable(war_tl)
 
 ```
@@ -84,4 +85,30 @@ causes <- url %>%
 causes
 
 ```
+
+## the First World War 
+```{r}
+# The Origins of WWI
+url_1 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
+ww1_1 <- url %>%
+    read_html() %>%
+    html_nodes(css = 'strong , .body_text .header')%>%
+  html_text() 
+ww1_1
+
+# 
+url_2 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
+ww1_2 <- url %>%
+    read_html() %>%
+    html_nodes(css = 'strong , .body_text .header')%>%
+  html_text() 
+ww1_2
+
+```
+
+
+
+
+
+
 
