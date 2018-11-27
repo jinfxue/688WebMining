@@ -16,9 +16,15 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("rvest")
 #install.packages("dplyr")
 #install.packages("knitr")
+#install.packages("tm")
+#install.packages("rJava")
+#install.packages("tm.plugin.webmining")
 library(rvest)
 library(dplyr)
 library(knitr)
+library(tm)
+library(rJava)
+library(tm.plugin.webmining)
 ```
 
 ## War Timeline
@@ -106,8 +112,31 @@ ww1_2
 
 ```
 
+## the Second World War 
+```{r}
+# The Origins of WWI
+url_1 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
+ww1_1 <- url %>%
+    read_html() %>%
+    html_nodes(css = 'strong , .body_text .header')%>%
+  html_text() 
+ww1_1
+
+# 
+url_2 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
+ww1_2 <- url %>%
+    read_html() %>%
+    html_nodes(css = 'strong , .body_text .header')%>%
+  html_text() 
+ww1_2
+
+```
+
+# 
+```{r}
 
 
+```
 
 
 
