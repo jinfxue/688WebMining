@@ -1,7 +1,7 @@
 ---
 title: "Initial Web Mining"
 author: "Jinfei Xue"
-date: "Nov 16, 2018"
+date: "Dec 2, 2018"
 output:
   html_document:
     df_print: paged
@@ -16,15 +16,13 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("rvest")
 #install.packages("dplyr")
 #install.packages("knitr")
-#install.packages("tm")
-#install.packages("rJava")
-#install.packages("tm.plugin.webmining")
+#install.packages("tidytext")
+#install.packages("ggplot2")
 library(rvest)
 library(dplyr)
 library(knitr)
-library(tm)
-library(rJava)
-library(tm.plugin.webmining)
+library(tidytext)
+library(ggplot2)
 ```
 
 ## War Timeline
@@ -132,11 +130,172 @@ ww1_2
 
 ```
 
-# 
-```{r}
+## the Korean War
 
+```{r, message=FALSE}
+url_kw <- c("https://www.historycrunch.com/causes-of-the-korean-war.html#/",
+        "https://www.historycentral.com/korea/causes.html", 
+        "http://time.com/3915803/korean-war-1950-history/", 
+        "http://www.learnkoreanlanguage.com/causes-of-the-korean-war.html", 
+        "http://www.bbc.co.uk/history/worldwars/coldwar/korea_hickey_01.shtml", 
+        "https://www.enotes.com/homework-help/can-someone-answer-what-were-factors-leading-up-158481")
+kw1 <- url_kw[1] %>%
+  read_html() %>%
+  html_nodes(css = '#wsite-content .paragraph font')%>%
+  html_text()
+kw2 <- url_kw[2] %>%
+  read_html() %>%
+  html_nodes(css = '.container .content p')%>%
+  html_text()
+kw3 <- url_kw[3] %>%
+  read_html() %>%
+  html_nodes(css = 'p')%>%
+  html_text()
+kw4 <- url_kw[4] %>%
+  read_html() %>%
+  html_nodes(css = 'p')%>%
+  html_text()
+kw5 <- url_kw[5] %>%
+  read_html() %>%
+  html_nodes(css = '.fr~ p , #four+ p , #three+ p , #two+ p , #one~ p')%>%
+  html_text()
+kw6 <- url_kw[6] %>%
+  read_html() %>%
+  html_nodes(css = '.anon-hide p')%>%
+  html_text()
+kw <- c(kw1, kw2, kw3, kw4, kw5, kw6)
 
+kw_df <- data_frame(text = kw)
+
+#my_stopwords <- data_frame(word = c("38th", "1950")
+kw_n <- kw_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(kw_n %>% filter(n > 7))
+
+# create a visualization of the most common words 
+kw_n %>%
+  filter(n > 7) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
 ```
+
+From the table and plot, we can see that there are some words like "north", "south", "china", "american", "japan", "communist", "troops", "military", "cold", "policy", "government", which are related to the causes of the Korean War.
+
+## the Vietnam War
+
+```{r}
+url_vw <- c("",
+        "", 
+        "", 
+        "", 
+        "", 
+        "")
+vw1 <- url_vw[1] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw2 <- url_vw[2] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw3 <- url_vw[3] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw4 <- url_vw[4] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw5 <- url_vw[5] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw6 <- url_vw[6] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw <- c(vw1, vw2, vw3, vw4, vw5, vw6)
+
+vw_df <- data_frame(text = vw)
+
+
+vw_n <- vw_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(vw_n %>% filter(n > 7))
+
+# create a visualization of the most common words 
+vw_n %>%
+  filter(n > 7) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+
+##
+
+```{r}
+url_vw <- c("",
+        "", 
+        "", 
+        "", 
+        "", 
+        "")
+vw1 <- url_vw[1] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw2 <- url_vw[2] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw3 <- url_vw[3] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw4 <- url_vw[4] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw5 <- url_vw[5] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw6 <- url_vw[6] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+vw <- c(vw1, vw2, vw3, vw4, vw5, vw6)
+
+vw_df <- data_frame(text = vw)
+
+
+vw_n <- vw_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(vw_n %>% filter(n > 7))
+
+# create a visualization of the most common words 
+vw_n %>%
+  filter(n > 7) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
 
 
 
