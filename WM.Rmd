@@ -189,49 +189,204 @@ From the table and plot, we can see that there are some words like "north", "sou
 ## the Vietnam War
 
 ```{r}
-url_vw <- c("",
-        "", 
-        "", 
-        "", 
-        "", 
-        "")
+url_1 <- "https://www.britannica.com/event/Vietnam-War"
+url_2 <- c("", "/French-rule-ended-Vietnam-divided", "/The-Diem-regime-and-the-Viet-Cong",
+           "/The-U-S-role-grows", "/The-conflict-deepens", 
+           "/The-Gulf-of-Tonkin", "/The-United-States-enters-the-war",
+           "/Firepower-comes-to-naught", "/Tet-brings-the-war-home",
+           "/De-escalation-negotiation-and-Vietnamization", "/The-United-States-negotiates-a-withdrawal",
+           "/The-fall-of-South-Vietnam")
+url <- paste0(url_1, url_2)
+url_vw <- c("https://www.historylearningsite.co.uk/vietnam-war/the-causes-of-the-vietnam-war/",
+            "http://www.english.illinois.edu/maps/vietnam/causes.htm",
+            "https://www.historycrunch.com/causes-of-the-vietnam-war.html#/",
+            "https://www.thoughtco.com/vietnam-war-origins-2361335", url,
+            "http://oxfordre.com/americanhistory/view/10.1093/acrefore/9780199329175.001.0001/acrefore-9780199329175-e-353")
+        
+
 vw1 <- url_vw[1] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = 'p:nth-child(26) span , p:nth-child(16) span , 
+             p:nth-child(15) , h3+ p , span+ p span')%>%
   html_text()
 vw2 <- url_vw[2] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = 'blockquote~ p+ p')%>%
   html_text()
 vw3 <- url_vw[3] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '#wsite-content .paragraph font')%>%
   html_text()
 vw4 <- url_vw[4] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '#mntl-sc-page_1-0 :nth-child(1)')%>%
   html_text()
-vw5 <- url_vw[5] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw6 <- url_vw[6] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw <- c(vw1, vw2, vw3, vw4, vw5, vw6)
+vw4 <- vw4[1:18]
 
+vw <- c(kw1, kw2, kw3, kw4)
 vw_df <- data_frame(text = vw)
+
+for (i in 5:length(url_vw)) {
+  vw_df <- rbind(vw_df, data_frame(text = url_vw[i] %>%
+  read_html() %>%
+  html_nodes(css = 'p')%>%
+  html_text()))
+}
+vw_df <- rbind(vw_df, data_frame(text = url_vw[17] %>%
+  read_html() %>%
+  html_nodes(css = '.abstract p')%>%
+  html_text()))
 
 
 vw_n <- vw_df %>% 
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
   count(word, sort = TRUE)
-kable(vw_n %>% filter(n > 7))
+kable(vw_n %>% filter(n > 25))
 
 # create a visualization of the most common words 
 vw_n %>%
+  filter(n > 25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+From the table and plot, we can see that there are some words like "north", "south", "china", "u.s", "korea", "communist", "troops", "military", "army", "president" and "government", which are related to the causes of the Vietnam War.
+
+## the six-day war
+
+```{r}
+url_sdw <- c("https://en.wikipedia.org/wiki/Origins_of_the_Six-Day_War",
+             "http://www.sixdaywar.org/content/causes.asp",
+             "https://www.history.com/topics/middle-east/six-day-war", 
+             "https://www.jewishvirtuallibrary.org/background-and-overview-six-day-war",
+             "https://www.myjewishlearning.com/article/the-six-day-war/",
+             "https://www.thehindu.com/news/international/israels-six-day-war-explained/article18960298.ece",
+             "https://adst.org/2014/05/the-six-day-miracle-the-1967-arab-israeli-war-and-how-it-changed-israel/", "https://www.foreignpolicyjournal.com/2017/06/05/who-started-the-six-day-war-of-june-1967/")
+
+sdw1 <- url_sdw[1] %>%
+  read_html() %>%
+  html_nodes(css = '#mw-content-text p')%>%
+  html_text()
+
+sdw2 <- url_sdw[2] %>%
+  read_html() %>%
+  html_nodes(css = 'div , p+ p , table+ p')%>%
+  html_text()
+sdw2 <- sdw2[-c(which(sdw2==""))]
+sdw2 <- sdw2[-c(6, 8, 10, 12)]
+
+sdw3 <- url_sdw[3] %>%
+  read_html() %>%
+  html_nodes(css = '#section_6+ p , #section_5+ p , #section_4+ p , #section_3+ p , #section_2+ p , p+ p , .not-size-d+ p , #section_1+ p , .l-wrap-left+ p')%>%
+  html_text()
+
+sdw4 <- url_sdw[4] %>%
+  read_html() %>%
+  html_nodes(css = 'blockquote+ p , table+ p , blockquote+ p q , blockquote > p , h3+ p , blockquote div , p+ p')%>%
+  html_text()
+sdw4 <- sdw4[-91]
+
+sdw5 <- url_sdw[5] %>%
+  read_html() %>%
+  html_nodes(css = '.alignnone+ p , p:nth-child(11) , h2+ p , .m-content__body p:nth-child(3)')%>%
+  html_text()
+
+sdw6 <- url_sdw[6] %>%
+  read_html() %>%
+  html_nodes(css = 'p:nth-child(18) , p:nth-child(17) , p:nth-child(15) , p:nth-child(14) , p:nth-child(12) , p:nth-child(11) , p:nth-child(10) , p:nth-child(9) , p:nth-child(7) , p:nth-child(6) , p:nth-child(4) , p:nth-child(3)')%>%
+  html_text()
+
+sdw7 <- url_sdw[7] %>%
+  read_html() %>%
+  html_nodes(css = 'h5~ p , p:nth-child(6) , p:nth-child(5)')%>%
+  html_text()
+sdw7 <- sdw7[-c(46, 47)]
+
+sdw8 <- url_sdw[8] %>%
+  read_html() %>%
+  html_nodes(css = 'h2~ p+ p , p~ h2+ p')%>%
+  html_text()
+
+sdw <- c(sdw1, sdw2, sdw3, sdw4, sdw5, sdw6, sdw7, sdw8)
+
+sdw_df <- data_frame(text = sdw)
+
+
+sdw_n <- sdw_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(sdw_n %>% filter(n > 30))
+
+# create a visualization of the most common words 
+sdw_n %>%
+  filter(n > 30) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+From the table and plot, we can see that there are some words like "israel", "arab", "egypt", "syria", "jordan", "military", "nasser", "government", "bank" and "president", which are related to the causes of the six-day war.
+
+## the Afghanistan War
+
+```{r}
+url_aw <- c("https://www.britannica.com/event/Afghanistan-War", 
+            "https://www.cfr.org/timeline/us-war-afghanistan", 
+            "https://en.wikipedia.org/wiki/War_in_Afghanistan_(2001%E2%80%93present)", 
+            "https://www.cfr.org/interactives/global-conflict-tracker#!/conflict/war-in-afghanistan")
+
+aw1 <- url_aw[1] %>%
+  read_html() %>%
+  html_nodes(css = 'p')%>%
+  html_text()
+aw1 <- aw1[-c(33:38)]
+
+aw2 <- url_aw[2] %>%
+  read_html() %>%
+  html_nodes(css = '.content-text p')%>%
+  html_text()
+
+aw3 <- url_aw[3] %>%
+  read_html() %>%
+  html_nodes(css = '.mw-parser-output > p')%>%
+  html_text()
+
+aw4 <- url_aw[4] %>%
+  read_html() %>%
+  html_nodes(css = 'p:nth-child(10) , p:nth-child(8) , p:nth-child(7) , p:nth-child(6) , p:nth-child(5) , p:nth-child(3) , .ng-binding p:nth-child(2)')%>%
+  html_text()
+
+
+
+
+aw5 <- url_aw[5] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+aw6 <- url_aw[6] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+aw <- c(aw1, aw2, aw3, aw4, aw5, aw6)
+
+aw_df <- data_frame(text = aw)
+
+
+aw_n <- aw_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(aw_n %>% filter(n > 7))
+
+# create a visualization of the most common words 
+aw_n %>%
   filter(n > 7) %>%
   mutate(word = reorder(word, n)) %>%
   ggplot(aes(word, n)) +
@@ -241,53 +396,48 @@ vw_n %>%
 ```
 
 
-
-##
+## the Iraq War
 
 ```{r}
-url_vw <- c("",
-        "", 
-        "", 
-        "", 
-        "", 
-        "")
-vw1 <- url_vw[1] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw2 <- url_vw[2] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw3 <- url_vw[3] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw4 <- url_vw[4] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw5 <- url_vw[5] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw6 <- url_vw[6] %>%
-  read_html() %>%
-  html_nodes(css = '')%>%
-  html_text()
-vw <- c(vw1, vw2, vw3, vw4, vw5, vw6)
+url_iw <- c("")
 
-vw_df <- data_frame(text = vw)
+iw1 <- url_iw[1] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+iw2 <- url_iw[2] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+iw3 <- url_iw[3] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+iw4 <- url_iw[4] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+iw5 <- url_iw[5] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+iw6 <- url_iw[6] %>%
+  read_html() %>%
+  html_nodes(css = '')%>%
+  html_text()
+iw <- c(iw1, iw2, iw3, iw4, iw5, iw6)
+
+iw_df <- data_frame(text = iw)
 
 
-vw_n <- vw_df %>% 
+iw_n <- iw_df %>% 
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
   count(word, sort = TRUE)
-kable(vw_n %>% filter(n > 7))
+kable(iw_n %>% filter(n > 7))
 
 # create a visualization of the most common words 
-vw_n %>%
+iw_n %>%
   filter(n > 7) %>%
   mutate(word = reorder(word, n)) %>%
   ggplot(aes(word, n)) +
