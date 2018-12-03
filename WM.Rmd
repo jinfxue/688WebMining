@@ -1,5 +1,5 @@
 ---
-title: "Initial Web Mining"
+title: "Web Mining"
 author: "Jinfei Xue"
 date: "Dec 2, 2018"
 output:
@@ -78,7 +78,7 @@ kable(mrw)
 
 We can see the eight main reasons for wars are "Economic Gain", "Territorial Gain", "Religion", "Nationalism", "Revenge", "Civil War", "Revolutionary War" and "Defensive War".
 
-### The Causes of War and Those of Peace
+### The Causes of War
 ```{r}
 url <- "https://www.theobjectivestandard.com/2014/10/causes-war-peace/"
 # Wikipedia: Causes of Wars
@@ -86,11 +86,11 @@ causes <- url %>%
     read_html() %>%
     html_nodes(css = 'td:nth-child(1) strong')%>%
   html_text() 
-causes
+kable(data_frame(causes))
 
 ```
 
-## the First World War 
+## 3.1 the First World War 
 ```{r}
 # The Origins of WWI
 url_1 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
@@ -98,39 +98,157 @@ ww1_1 <- url %>%
     read_html() %>%
     html_nodes(css = 'strong , .body_text .header')%>%
   html_text() 
-ww1_1
 
-# 
 url_2 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
 ww1_2 <- url %>%
     read_html() %>%
     html_nodes(css = 'strong , .body_text .header')%>%
   html_text() 
-ww1_2
 
+ww1 <- c(ww1_1, ww1_2)
+kable(data_frame(WW1_Causes=ww1))
 ```
 
-## the Second World War 
+```{r}
+url_ww1 <- c("https://www.historyonthenet.com/world-war-one-causes-2", 
+             "https://www.thoughtco.com/causes-that-led-to-world-war-i-105515", 
+             "https://www.historyhit.com/the-4-m-a-i-n-causes-of-world-war-one/", 
+             "https://online.norwich.edu/academic-programs/resources/six-causes-of-world-war-i", 
+             "https://medium.com/@dhireshnathwani/what-was-the-most-significant-cause-of-world-war-one-ww1-74bb9e815e37", 
+             "https://www.firstworldwar.com/origins/causes.htm", 
+             "https://www.ancienthistorylists.com/world-war-1/top-10-causes-of-world-war-1/")
+
+ww11 <- url_ww1[1] %>%
+  read_html() %>%
+  html_nodes(css = 'h3+ p , p~ h2+ p , #mobile-in-article-1+ p , hr+ p')%>%
+  html_text()
+
+ww12 <- url_ww1[2] %>%
+  read_html() %>%
+  html_nodes(css = '#mntl-sc-block_3-0-1 p , #mntl-sc-block_2-0-16 p , #mntl-sc-block_2-0-13 p , #mntl-sc-block_2-0-10 p , #mntl-sc-block_2-0-7 p , #mntl-sc-block_2-0-4 p , .mntl-sc-block-heading__text , #mntl-sc-block_2-0-3 li , #mntl-sc-block_2-0-2 p')%>%
+  html_text()
+
+ww13 <- url_ww1[3] %>%
+  read_html() %>%
+  html_nodes(css = '.alignnone~ p , p p , .single li , p:nth-child(12) , h2~ h2 , p:nth-child(8)')%>%
+  html_text()
+
+ww14 <- url_ww1[4] %>%
+  read_html() %>%
+  html_nodes(css = 'p:nth-child(14) , h2+ p , .even h2 , #block-system-main p:nth-child(1)')%>%
+  html_text()
+
+ww15 <- url_ww1[5] %>%
+  read_html() %>%
+  html_nodes(css = '#7c29 , #4ec5+ .graf-after--p , #4ec5 , #0bd4 , #43d2 , #f0b7 , #3cde , #8c52 , #da23 , #42e2+ .graf-after--p , #42e2')%>%
+  html_text()
+
+ww16 <- url_ww1[6] %>%
+  read_html() %>%
+  html_nodes(css = 'ul~ h3+ p , #main li , p:nth-child(16) , p:nth-child(10) , #advertincontentlargeblock~ p+ p , #advertincontentlargeblock+ p')%>%
+  html_text()
+
+ww17 <- url_ww1[7] %>%
+  read_html() %>%
+  html_nodes(css = 'p:nth-child(33) , p:nth-child(31) , p:nth-child(29) , p:nth-child(23) , p:nth-child(19) , p:nth-child(17) , p:nth-child(14) , p:nth-child(10) , #post-4 p:nth-child(7) , p:nth-child(5) , p:nth-child(3)')%>%
+  html_text()
+
+
+ww1 <- c(ww11, ww12, ww13, ww14, ww15, ww16, ww17)
+ww1_df <- data_frame(text = ww1)
+
+ww1_n <- ww1_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(ww1_n %>% filter(n > 20))
+
+# create a visualization of the most common words 
+ww1_n %>%
+  filter(n > 20) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+
+
+
+## 3.2 the Second World War 
 ```{r}
 # The Origins of WWI
-url_1 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
-ww1_1 <- url %>%
+url <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
+ww2 <- url %>%
     read_html() %>%
     html_nodes(css = 'strong , .body_text .header')%>%
   html_text() 
-ww1_1
-
-# 
-url_2 <- "https://www.historyonthenet.com/authentichistory/1914-1920/1-overview/1-origins/index.html"
-ww1_2 <- url %>%
-    read_html() %>%
-    html_nodes(css = 'strong , .body_text .header')%>%
-  html_text() 
-ww1_2
-
+kable(data_frame(WW2_Causes = ww2))
 ```
 
-## the Korean War
+```{r}
+url_ww2 <- c("https://en.wikipedia.org/wiki/Causes_of_World_War_II", 
+             "https://www.history.com/topics/world-war-ii/world-war-ii-history", 
+             "https://www.thoughtco.com/world-war-ii-road-to-war-2361456", 
+             "https://en.wikibooks.org/wiki/World_History/Causes_and_course_of_the_Second_World_War", 
+             "https://www.theweek.co.uk/60237/how-and-why-did-world-war-2-start", 
+             "https://www.historic-newspapers.co.uk/blog/what-started-world-war-two/")
+             
+
+ww21 <- url_ww2[1] %>%
+  read_html() %>%
+  html_nodes(css = 'p')%>%
+  html_text()
+
+ww22 <- url_ww2[2] %>%
+  read_html() %>%
+  html_nodes(css = '.m-detail--body p')%>%
+  html_text()
+
+ww23 <- url_ww2[3] %>%
+  read_html() %>%
+  html_nodes(css = 'p')%>%
+  html_text()
+ww23 <- ww23[-c(17, 18)]
+
+ww24 <- url_ww2[4] %>%
+  read_html() %>%
+  html_nodes(css = 'p:nth-child(49) , p:nth-child(48) , p:nth-child(42) , p:nth-child(37) , p:nth-child(36) , p:nth-child(35) , p:nth-child(31) , p:nth-child(32) , h4+ p , p:nth-child(24) , p:nth-child(17) , h3+ p , h2+ p')%>%
+  html_text()
+
+ww25 <- url_ww2[5] %>%
+  read_html() %>%
+  html_nodes(css = 'h5+ p , p+ p')%>%
+  html_text()
+
+ww26 <- url_ww2[6] %>%
+  read_html() %>%
+  html_nodes(css = 'p:nth-child(40) , p:nth-child(37) , p:nth-child(34) , p:nth-child(29) , p:nth-child(28) , p:nth-child(23) , p:nth-child(22) , p:nth-child(21) , p:nth-child(20) , p:nth-child(19) , p:nth-child(14) , p:nth-child(11) , p:nth-child(3) , p:nth-child(2) , p:nth-child(8) , p:nth-child(1)')%>%
+  html_text()
+
+ww2 <- c(ww21, ww22, ww23, ww24, ww25, ww26)
+ww2_df <- data_frame(text = ww2)
+
+ww2_n <- ww2_df %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+kable(ww2_n %>% filter(n > 25))
+
+# create a visualization of the most common words 
+ww2_n %>%
+  filter(n > 25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+## 3.3 the Korean War
 
 ```{r, message=FALSE}
 url_kw <- c("https://www.historycrunch.com/causes-of-the-korean-war.html#/",
@@ -186,7 +304,7 @@ kw_n %>%
 
 From the table and plot, we can see that there are some words like "north", "south", "china", "american", "japan", "communist", "troops", "military", "cold", "policy", "government", which are related to the causes of the Korean War.
 
-## the Vietnam War
+## 3.4 the Vietnam War
 
 ```{r}
 url_1 <- "https://www.britannica.com/event/Vietnam-War"
@@ -209,14 +327,17 @@ vw1 <- url_vw[1] %>%
   html_nodes(css = 'p:nth-child(26) span , p:nth-child(16) span , 
              p:nth-child(15) , h3+ p , span+ p span')%>%
   html_text()
+
 vw2 <- url_vw[2] %>%
   read_html() %>%
   html_nodes(css = 'blockquote~ p+ p')%>%
   html_text()
+
 vw3 <- url_vw[3] %>%
   read_html() %>%
   html_nodes(css = '#wsite-content .paragraph font')%>%
   html_text()
+
 vw4 <- url_vw[4] %>%
   read_html() %>%
   html_nodes(css = '#mntl-sc-page_1-0 :nth-child(1)')%>%
@@ -232,6 +353,7 @@ for (i in 5:length(url_vw)) {
   html_nodes(css = 'p')%>%
   html_text()))
 }
+
 vw_df <- rbind(vw_df, data_frame(text = url_vw[17] %>%
   read_html() %>%
   html_nodes(css = '.abstract p')%>%
@@ -256,7 +378,7 @@ vw_n %>%
 
 From the table and plot, we can see that there are some words like "north", "south", "china", "u.s", "korea", "communist", "troops", "military", "army", "president" and "government", which are related to the causes of the Vietnam War.
 
-## the six-day war
+## 3.5 the six-day war
 
 ```{r}
 url_sdw <- c("https://en.wikipedia.org/wiki/Origins_of_the_Six-Day_War",
@@ -312,7 +434,6 @@ sdw8 <- url_sdw[8] %>%
   html_text()
 
 sdw <- c(sdw1, sdw2, sdw3, sdw4, sdw5, sdw6, sdw7, sdw8)
-
 sdw_df <- data_frame(text = sdw)
 
 
@@ -334,13 +455,15 @@ sdw_n %>%
 
 From the table and plot, we can see that there are some words like "israel", "arab", "egypt", "syria", "jordan", "military", "nasser", "government", "bank" and "president", which are related to the causes of the six-day war.
 
-## the Afghanistan War
+## 3.6 the Afghanistan War
 
 ```{r}
 url_aw <- c("https://www.britannica.com/event/Afghanistan-War", 
             "https://www.cfr.org/timeline/us-war-afghanistan", 
             "https://en.wikipedia.org/wiki/War_in_Afghanistan_(2001%E2%80%93present)", 
-            "https://www.cfr.org/interactives/global-conflict-tracker#!/conflict/war-in-afghanistan")
+            "https://en.wikipedia.org/wiki/War_in_Afghanistan_(1978%E2%80%93present)", 
+            "https://www.mei.edu/publications/causes-and-consequences-destabilization-afghanistan",
+            "https://www.brookings.edu/opinions/pakistans-role-in-the-afghanistan-wars-outcome/")
 
 aw1 <- url_aw[1] %>%
   read_html() %>%
@@ -360,22 +483,23 @@ aw3 <- url_aw[3] %>%
 
 aw4 <- url_aw[4] %>%
   read_html() %>%
-  html_nodes(css = 'p:nth-child(10) , p:nth-child(8) , p:nth-child(7) , p:nth-child(6) , p:nth-child(5) , p:nth-child(3) , .ng-binding p:nth-child(2)')%>%
+  html_nodes(css = 'p')%>%
   html_text()
-
-
-
 
 aw5 <- url_aw[5] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '#main-container p+ p')%>%
   html_text()
+aw5 <- aw5[-11]
+
 aw6 <- url_aw[6] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '.post-body-enhanced p')%>%
   html_text()
-aw <- c(aw1, aw2, aw3, aw4, aw5, aw6)
+aw6 <- aw6[-c(which(aw6==""))]
+aw6 <- aw6[-c(7, 11)]
 
+aw <- c(aw1, aw2, aw3, aw4, aw5, aw6)
 aw_df <- data_frame(text = aw)
 
 
@@ -383,11 +507,11 @@ aw_n <- aw_df %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
   count(word, sort = TRUE)
-kable(aw_n %>% filter(n > 7))
+kable(aw_n %>% filter(n > 60))
 
 # create a visualization of the most common words 
 aw_n %>%
-  filter(n > 7) %>%
+  filter(n > 60) %>%
   mutate(word = reorder(word, n)) %>%
   ggplot(aes(word, n)) +
   geom_col() +
@@ -396,37 +520,48 @@ aw_n %>%
 ```
 
 
-## the Iraq War
+## 3.7 the Iraq War
 
 ```{r}
-url_iw <- c("")
+url_iw <- c("https://en.wikipedia.org/wiki/Iraq_War", 
+            "https://www.britannica.com/event/Iraq-War", 
+            "http://duckofminerva.com/2013/07/what-caused-the-iraq-war-a-debate-part-1-of-2.html", 
+            "https://www.e-ir.info/2015/03/09/one-war-many-reasons-the-us-invasion-of-iraq/", 
+            "https://archive.nytimes.com/www.nytimes.com/ref/timestopics/topics_iraq.html?scp=8&sq=the%2525",
+            "https://www.cnn.com/2013/03/19/opinion/iraq-war-oil-juhasz/index.html")
 
 iw1 <- url_iw[1] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '.tright+ ul li , #mw-content-text h3+ ul li , .mw-parser-output > p , .tright~ p+ ul li , p+ p')%>%
   html_text()
+
 iw2 <- url_iw[2] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = 'section > p')%>%
   html_text()
+
 iw3 <- url_iw[3] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '.post-content p+ p')%>%
   html_text()
+
 iw4 <- url_iw[4] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '.category-terrorism p')%>%
   html_text()
+iw4 <- iw4[-c(54:102)]
+
 iw5 <- url_iw[5] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = 'p')%>%
   html_text()
+
 iw6 <- url_iw[6] %>%
   read_html() %>%
-  html_nodes(css = '')%>%
+  html_nodes(css = '.zn-body__paragraph')%>%
   html_text()
-iw <- c(iw1, iw2, iw3, iw4, iw5, iw6)
 
+iw <- c(iw1, iw2, iw3, iw4, iw5, iw6)
 iw_df <- data_frame(text = iw)
 
 
@@ -434,11 +569,11 @@ iw_n <- iw_df %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
   count(word, sort = TRUE)
-kable(iw_n %>% filter(n > 7))
+kable(iw_n %>% filter(n > 45))
 
 # create a visualization of the most common words 
 iw_n %>%
-  filter(n > 7) %>%
+  filter(n > 45) %>%
   mutate(word = reorder(word, n)) %>%
   ggplot(aes(word, n)) +
   geom_col() +
@@ -446,6 +581,13 @@ iw_n %>%
   coord_flip()
 ```
 
+# 4 The Common Causes for the Listed 7 Wars
+
+```{r}
+library(plyr)
+cc <- join_all(list(ww1_n, ww2_n, kw_n, vw_n, sdw_n, aw_n, iw_n), by='word', type='inner')
+#cc <- inner_join(ww1_n, ww2_n, by = "word") 
+```
 
 
 
