@@ -23,7 +23,6 @@ library(dplyr)
 library(knitr)
 library(tidytext)
 library(ggplot2)
-library(plyr)
 ```
 
 ## War Timeline
@@ -586,6 +585,7 @@ iw_n %>%
 # 4 The Common Causes for the Listed 7 Wars
 
 ```{r}
+library(plyr)
 cc <- join_all(list(ww1_n, ww2_n, kw_n, vw_n, sdw_n, aw_n, iw_n), by='word', type='inner')
 colnames(cc) <- c("word", "n_ww1", "n_ww2", "n_kw", "n_vw", "n_sdw", "n_aw", "n_iw")
 
