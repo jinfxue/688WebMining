@@ -3,9 +3,9 @@ title: "Web Mining"
 author: "Jinfei Xue"
 date: "Dec 2, 2018"
 output:
+  word_document: default
   html_document:
     df_print: paged
-  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,6 +23,7 @@ library(dplyr)
 library(knitr)
 library(tidytext)
 library(ggplot2)
+library(plyr)
 ```
 
 ## War Timeline
@@ -43,7 +44,8 @@ for (i in 1:length(timeline)) {
   war[i] <- unlist(strsplit(timeline[i], ", "))[1]
   time[i] <- unlist(strsplit(timeline[i], ", "))[2]
 }
-war_tl <- unique(data.frame(war, time))
+war_tl <- unique(data.frame(war, time)) 
+war_tl <- na.omit(war_tl)
 rownames(war_tl) <- 1:19
 kable(war_tl)
 
@@ -584,8 +586,21 @@ iw_n %>%
 # 4 The Common Causes for the Listed 7 Wars
 
 ```{r}
-library(plyr)
 cc <- join_all(list(ww1_n, ww2_n, kw_n, vw_n, sdw_n, aw_n, iw_n), by='word', type='inner')
+colnames(cc) <- c("word", "n_ww1", "n_ww2", "n_kw", "n_vw", "n_sdw", "n_aw", "n_iw")
+
+colsum <- colSums(cc[2:ncol(cc)])
+n <- sum(colsum)
+
+cc$sum <- rowSums(cc[,2:ncol(cc)])
+cc$percent <- cc$sum/n
+
+cc_1 <- cc %>%
+  arrange(desc(percent))
+
+kable(cc_1[1:10,])
+wordcloud::wordcloud(cc_1$word, cc_1$sum)
+
 #cc <- inner_join(ww1_n, ww2_n, by = "word") 
 ```
 
