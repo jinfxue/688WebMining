@@ -598,8 +598,11 @@ cc$percent <- cc$sum/n
 cc_1 <- cc %>%
   arrange(desc(percent))
 
-kable(cc_1[1:10,])
-wordcloud::wordcloud(cc_1$word, cc_1$sum)
+kableExtra::kable(cc_1[1:10,])
+
+word_count <- cc_1 %>%
+  select(word, sum)
+wordcloud2::wordcloud2(word_count,color="random-light",rotateRatio = 0.3)
 
 #cc <- inner_join(ww1_n, ww2_n, by = "word") 
 ```
